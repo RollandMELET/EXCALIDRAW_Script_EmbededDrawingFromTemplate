@@ -1,10 +1,9 @@
 /*
 Script Excalidraw pour créer et intégrer des objets depuis un template
-Version 1.3.0 - Toggle programmatique pour affichage immédiat
+Version 1.2.9 - Fix synchronisation nom fichier/embed
 Author: Rolland MELET & Claude Code
 Date: 2025-08-15
 Changelog:
-- v1.3.0: Ajout du toggle programmatique Markdown/Excalidraw pour forcer l'affichage des embeds
 - v1.2.9: Fix critique - Synchronisation du nom dans l'embed entry avec le nom réel du fichier
 - v1.2.8: Fix affichage immédiat des embeds (status "saved" + ordre opérations)
 - v1.2.7: Approche simplifiée en deux étapes pour les doublons
@@ -318,7 +317,7 @@ async function getTemplateContent(templateInfo) {
 function getViewCenter(excalidrawContent) {
     try {
         // Extraire appState du contenu
-        const appStateMatch = excalidrawContent.match(/"appState":\s*{([^}]*)}/);
+        const appStateMatch = excalidrawContent.match(/"appState":\s*{([^}]*)}/)
         if (appStateMatch) {
             const appStateStr = `{${appStateMatch[1]}}`;
             // Extraire scrollX, scrollY et zoom
@@ -350,7 +349,7 @@ function getViewCenter(excalidrawContent) {
 
 // Script principal
 (async () => {
-    console.log("Script Excalidraw Embed v1.3.0 - Démarrage");
+    console.log("Script Excalidraw Embed v1.2.9 - Démarrage");
     
     // Étape 1: Sélectionner le template
     const templateInfo = await selectTemplate();
@@ -530,9 +529,6 @@ function getViewCenter(excalidrawContent) {
             return;
         }
         
-        // Attendre que le fichier soit indexé par Obsidian
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
         // Générer un ID unique pour l'embed
         const fileId = generateFileId();
         
@@ -564,7 +560,7 @@ function getViewCenter(excalidrawContent) {
             }
         }
         
-        // Créer l'élément image pour l'embed avec status "saved"
+        // Créer l'élément image pour l'embed avec status "saved" au lieu de "pending"
         const imageElement = {
             id: generateFileId().substring(0, 16),
             type: "image",
@@ -590,7 +586,7 @@ function getViewCenter(excalidrawContent) {
             updated: Date.now(),
             link: null,
             locked: false,
-            status: "saved",  // Status "saved" pour indiquer que l'embed est prêt
+            status: "saved",  // CHANGEMENT : "saved" au lieu de "pending"
             fileId: fileId,
             scale: [1, 1]
         };
@@ -659,78 +655,36 @@ function getViewCenter(excalidrawContent) {
         await app.vault.adapter.write(activeFile.path, excalidrawContent);
         
         // Attendre que la sauvegarde soit complète
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 500));
         
-        // NOUVEAU : Toggle programmatique pour forcer Excalidraw à recharger les embeds
+        // CHANGEMENT : Rafraîchissement amélioré
         try {
-            console.log("Tentative de toggle programmatique...");
-            
-            // Obtenir la vue active
             const activeLeaf = app.workspace.activeLeaf;
-            if (activeLeaf && activeLeaf.view) {
-                const view = activeLeaf.view;
+            if (activeLeaf) {
+                // Fermer et rouvrir le fichier pour forcer un rechargement complet
+                const currentFile = activeFile;
                 
-                // Méthode 1 : Si c'est une vue Markdown/Excalidraw
-                if (view.getViewType && (view.getViewType() === "markdown" || view.getViewType() === "excalidraw")) {
-                    console.log("Vue Excalidraw/Markdown détectée, toggle en cours...");
-                    
-                    // Sauvegarder l'état actuel
-                    const currentState = view.getState ? view.getState() : null;
-                    
-                    // Passer en mode source (Markdown)
-                    if (view.setMode) {
-                        await view.setMode('source');
-                        console.log("Passage en mode source");
-                        await new Promise(resolve => setTimeout(resolve, 200));
-                        
-                        // Revenir en mode preview (Excalidraw)
-                        await view.setMode('preview');
-                        console.log("Retour en mode preview");
-                    } else if (view.setState && currentState) {
-                        // Méthode alternative : forcer un rechargement de l'état
-                        console.log("Utilisation de setState pour rafraîchir");
-                        await view.setState(currentState, { history: false });
-                    }
-                }
+                // Ouvrir temporairement un autre fichier ou créer une note vide
+                await activeLeaf.openFile(null);
                 
-                // Méthode 2 : Fermer et rouvrir le fichier
-                else {
-                    console.log("Toggle via fermeture/réouverture du fichier");
-                    
-                    // Créer une note temporaire vide
-                    const tempNote = await app.vault.create(`temp-${Date.now()}.md`, "");
-                    
-                    // Ouvrir la note temporaire
-                    await activeLeaf.openFile(tempNote);
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    
-                    // Rouvrir le fichier Excalidraw
-                    await activeLeaf.openFile(activeFile);
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    
-                    // Supprimer la note temporaire
-                    await app.vault.delete(tempNote);
-                }
+                // Petit délai
+                await new Promise(resolve => setTimeout(resolve, 100));
                 
-                // Méthode 3 : Déclencher un événement de modification
-                if (app.workspace.trigger) {
-                    console.log("Déclenchement d'un événement file-open");
-                    app.workspace.trigger('file-open', activeFile);
-                }
+                // Rouvrir le fichier Excalidraw
+                await activeLeaf.openFile(currentFile);
                 
-                console.log("Toggle programmatique terminé");
+                console.log("Rafraîchissement complet effectué");
             }
         } catch (e) {
-            console.error("Erreur lors du toggle programmatique:", e);
-            
-            // Fallback : rafraîchissement simple
+            console.error("Erreur lors du rafraîchissement:", e);
+            // Fallback sur l'ancien système de rafraîchissement
             try {
                 const activeLeaf = app.workspace.activeLeaf;
                 if (activeLeaf) {
                     await activeLeaf.openFile(activeFile);
                 }
             } catch (e2) {
-                console.error("Erreur lors du rafraîchissement fallback:", e2);
+                // Ignorer les erreurs de rafraîchissement
             }
         }
         

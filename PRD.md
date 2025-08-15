@@ -1,10 +1,10 @@
 
 ## **PRD : Création et Intégration Dynamique d'Objets de Workflow dans Excalidraw pour Obsidian**
 
-**Version :** 1.2
+**Version :** 1.3
 **Date :** 2025-08-15
 **Auteur :** SuperAssistant (sur la base des besoins et de l'analyse technique de l'utilisateur)
-**Mise à jour :** Ajout de la sélection dynamique de templates
+**Mise à jour :** Version stable avec affichage immédiat des embeds
 **Sources d'Information :**
 *   **Dépôt GitHub du Plugin Excalidraw :** [https://github.com/zsviczian/obsidian-excalidraw-plugin](https://github.com/zsviczian/obsidian-excalidraw-plugin)
 *   **Documentation de l'API Excalidraw Automate :** [https://zsviczian.github.io/obsidian-excalidraw-plugin/](https://zsviczian.github.io/obsidian-excalidraw-plugin/)
@@ -157,17 +157,19 @@ Les multiples tentatives ont révélé des instabilités et des conflits de cont
 - Format `|100%` pour affichage correct
 - Sauvegarde forcée et rafraîchissement
 
-#### Phase 2 - Version 1.2.0 (En cours)
+#### Phase 2 - Version 1.2.0 ✅ (Complétée)
 - Sélection dynamique de templates
 - Interface de sélection intuitive
 - Templates récents et mémorisation
 - Support des catégories
+- Gestion intelligente des doublons
 
-#### Phase 3 - Version 1.3.0 (Future)
-- Templates favoris
-- Raccourcis personnalisés par template
-- Aperçu des templates avant sélection
-- Import/Export de templates
+#### Phase 3 - Version 1.3.0 ✅ (Complétée - Version Stable)
+- Toggle programmatique pour affichage immédiat
+- Résolution définitive du bug d'affichage
+- Multiples méthodes de rafraîchissement
+- Optimisation des performances
+- Version de production stable
 
 #### Phase 4 - Version 2.0.0 (Vision long terme)
 - Création de templates depuis objets existants
