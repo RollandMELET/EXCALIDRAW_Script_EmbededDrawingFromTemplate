@@ -1,112 +1,129 @@
-# Excalidraw Embed Object from Template Script
+# Excalidraw Embed from Template Script
 
-## Description
-Script Excalidraw pour Obsidian permettant de créer et d'intégrer automatiquement des objets de workflow depuis des templates personnalisables directement dans vos dessins Excalidraw.
+## The "Back of the Card" Problem - Solved
 
-## Version actuelle : v1.3.0 (Stable)
-Date de mise à jour : 15/08/2025
+This script solves a specific workflow challenge in Obsidian's Excalidraw plugin, inspired by Zsolt's Visual Zettelkasten methodology demonstrated in his videos on [Visual Zettelkasten](https://www.youtube.com/watch?v=o49C8jQIsvs), [Block References](https://www.youtube.com/watch?v=yDZ6v7_OqZE), and [Hybrid Notes](https://www.youtube.com/watch?v=DbeLGGxvKZQ).
 
-## 🎯 Fonctionnalités principales
+### The Problem
+In Zsolt's Visual PKM approach, every visual element should have a "back of the card" - a markdown file containing the element's metadata, detailed information, and connections. Previously, creating these embedded objects required:
 
-### ✨ Création automatique d'embeds
-- Création d'objets de workflow directement depuis Excalidraw
-- Intégration automatique comme embed dans le dessin actif
-- Positionnement intelligent au centre de la vue avec décalage en cascade
-- Support complet des fichiers Excalidraw embeddés
+1. **Exit Excalidraw** - Break your visual flow
+2. **Create a new markdown file** - Navigate file explorer  
+3. **Apply a template** - Find and copy the right template
+4. **Return to Excalidraw** - Context switch back
+5. **Manually embed the file** - Drag or use `![[filename]]` syntax
 
-### 🎨 Système de templates dynamique (v1.2.0+)
-- **Sélection interactive** parmi les templates disponibles dans le dossier `Templates/`
-- **Support des catégories** de templates (sous-dossiers)
-- **Mémorisation automatique** des 5 derniers templates utilisés
-- **Templates favoris** avec accès rapide (⭐)
-- **Template par défaut intégré** en fallback
+**Result:** 5+ steps, multiple context switches, disrupted creative flow.
 
-### 🔄 Gestion intelligente des doublons (v1.2.1+)
-- Détection automatique des noms de fichiers existants
-- **Propositions intelligentes** : nom(1), nom(2), nom_v2, nom_copy
-- Interface intuitive avec `utils.suggester()`
-- Option pour saisir un nom personnalisé
+### The Solution
+With this script: **One keyboard shortcut** creates everything instantly, without leaving Excalidraw.
 
-### 🖼️ Affichage immédiat des embeds (v1.3.0)
-- **Toggle programmatique automatique** pour forcer l'affichage
-- **Pas de manipulation manuelle** requise
-- **Multiples méthodes de rafraîchissement** pour compatibilité maximale
-- Résolution définitive du bug d'affichage initial
+Press `Cmd+Shift+O` → Select template → Name your object → Done! The embedded object appears immediately in your drawing with its backing markdown file already created.
 
-## 📋 Prérequis
+## Current Version: v1.3.0 (Bilingual)
+Released: August 15, 2025
 
-- **Obsidian** v1.5.0 ou supérieur
-- **Plugin Excalidraw** v2.14.0 ou supérieur
-- Un dossier `Templates/` dans votre vault (optionnel)
+## 🎯 Key Features
+
+### ✨ True Visual PKM Workflow
+- Create embedded objects **directly from Excalidraw** - no context switching
+- Automatic "back of the card" markdown file generation
+- Instant visual feedback - embeds appear immediately
+- Perfect for Visual Zettelkasten methodology
+
+### 🌍 Bilingual Support (v1.3.0)
+- **Automatic language detection** (EN/FR)
+- Uses Obsidian's locale settings
+- Seamless experience for international users
+- All messages and prompts in your language
+
+### 🎨 Dynamic Template System
+- **Interactive template selection** from your `Templates/` folder
+- **Category support** via subfolders
+- **Recently used templates** (last 5) for quick access
+- **Favorite templates** marked with ⭐
+- **Built-in fallback template** when no templates available
+
+### 🔄 Smart Duplicate Handling
+- Automatic detection of existing filenames
+- **Intelligent suggestions**: name(1), name(2), name_v2, name_copy
+- Clean interface using `utils.suggester()`
+- Custom naming option available
+
+## 📋 Prerequisites
+
+- **Obsidian** v1.5.0 or higher
+- **Excalidraw Plugin** v2.14.0 or higher (by Zsolt Viczian)
+- `Templates/` folder in your vault (optional but recommended)
 
 ## 🚀 Installation
 
-### Installation via le menu Scripts d'Excalidraw
+### Via Excalidraw Scripts Menu (Recommended)
 
-1. Ouvrez un fichier Excalidraw dans Obsidian
-2. Cliquez sur l'icône **outils** dans la barre d'outils Excalidraw
-3. Accédez à **Scripts** → **Downloaded** → **Install new**
-4. Copiez le contenu du fichier `embed-object-from-template.md`
-5. Le script apparaîtra dans la section "Downloaded"
+1. Open any Excalidraw file in Obsidian
+2. Click the **tools icon** in Excalidraw toolbar
+3. Navigate to **Scripts** → **Downloaded** → **Install new**
+4. Copy the entire content of `embed-object-from-template.md`
+5. The script will appear in the "Downloaded" section with a custom cube icon
 
-### Installation manuelle
+### Manual Installation
 
-1. Copiez le fichier `embed-object-from-template.md` dans :
+1. Copy `embed-object-from-template.md` to:
    ```
-   VotreVault/Excalidraw/Scripts/Downloaded/
+   YourVault/Excalidraw/Scripts/Downloaded/
    ```
-2. Redémarrez Obsidian ou rafraîchissez les scripts
+2. Restart Obsidian or refresh scripts
 
-## 🎮 Utilisation
+## 🎮 Usage
 
-### Utilisation basique
+### Basic Workflow
 
-1. **Ouvrez** un fichier Excalidraw
-2. **Lancez** le script depuis :
-   - Menu Scripts → Downloaded → embed-object-from-template
-   - Ou via raccourci clavier configuré
-3. **Sélectionnez** un template dans la liste ou utilisez le template par défaut
-4. **Entrez** le nom de votre objet de workflow
-5. **L'objet est créé** et automatiquement intégré dans votre dessin !
+1. **Open** an Excalidraw drawing
+2. **Launch** the script:
+   - Via Scripts menu → Downloaded → embed-object-from-template
+   - Or use your configured keyboard shortcut
+3. **Select** a template from the list (or use default)
+4. **Name** your workflow object
+5. **Done!** Object is created and embedded instantly
 
-### Configuration d'un raccourci clavier
+### Keyboard Shortcut Setup
 
-1. Paramètres → Raccourcis clavier
-2. Recherchez "Excalidraw: embed-object-from-template"
-3. Assignez un raccourci (ex : `Cmd+Shift+O` ou `Ctrl+Shift+O`)
+1. Settings → Hotkeys
+2. Search for "Excalidraw: embed-object-from-template"
+3. Assign shortcut (e.g., `Cmd+Shift+O` or `Ctrl+Shift+O`)
 
-### Organisation des templates
+### Template Organization
 
-Placez vos templates Excalidraw dans le dossier `Templates/` de votre vault :
+Structure your templates in the `Templates/` folder:
 
 ```
 Templates/
-├── MonTemplateAction.md
-├── MonTemplateObjet.md
+├── BasicCard.md
+├── ProcessStep.md
 ├── Workflows/
-│   ├── WorkflowSimple.md
-│   └── WorkflowComplexe.md
-├── Phases/
-│   ├── Phase1.md
-│   └── Phase2.md
-└── CreerObjetWorkflow.md
+│   ├── SimpleWorkflow.md
+│   └── ComplexWorkflow.md
+├── Concepts/
+│   ├── Definition.md
+│   └── Reference.md
+└── DataStructure.md
 ```
 
-Les templates sont automatiquement :
-- Détectés et listés par catégorie
-- Triés alphabétiquement
-- Mémorisés après utilisation
+Templates are automatically:
+- Discovered and listed by category
+- Sorted alphabetically
+- Remembered after use (recent templates)
 
-## ⚙️ Configuration avancée
+## ⚙️ Advanced Configuration
 
-### Structure d'un template
+### Template Structure
 
-Les templates doivent être des fichiers Excalidraw valides avec :
-- Header YAML avec `excalidraw-plugin: parsed`
-- Sections standard Excalidraw
-- Variable `${objectName}` pour le contenu dynamique
+Templates must be valid Excalidraw files containing:
+- YAML header with `excalidraw-plugin: parsed`
+- Standard Excalidraw sections
+- `${objectName}` variable for dynamic content
 
-### Exemple de template minimal
+### Minimal Template Example
 
 ```markdown
 ---
@@ -136,91 +153,107 @@ ${objectName}
 %%
 ```
 
-### Personnalisation des dimensions
+## 🎯 Use Cases (Visual PKM)
 
-Modifiez les lignes de création de l'élément image dans le script :
-```javascript
-width: 400,   // Largeur de l'embed
-height: 300,  // Hauteur de l'embed
-```
+### Visual Zettelkasten
+Create atomic notes with visual representations. Each embedded object becomes a permanent note in your Zettelkasten with both visual and textual dimensions.
 
-## 🔧 Résolution des problèmes
+### Process Documentation
+Build complex workflows visually while maintaining detailed documentation in the backing files. Perfect for standard operating procedures.
 
-| Problème | Solution |
-|----------|----------|
-| L'embed ne s'affiche pas | ✅ Résolu dans v1.3.0 avec toggle automatique |
-| "Aucun fichier actif" | Ouvrez d'abord un dessin Excalidraw |
-| Templates non trouvés | Vérifiez le dossier `Templates/` et le format des fichiers |
-| Nom de fichier déjà existant | Le script propose automatiquement des alternatives |
-| Erreur de création | Vérifiez les permissions sur le dossier |
+### Knowledge Graphs
+Construct visual knowledge graphs where each node has rich metadata and connections stored in its markdown file.
 
-## 📊 Architecture technique
+### Project Planning
+Design project structures visually with each component having detailed specifications in its "back of the card."
 
-### Workflow du script
+## 🔧 Troubleshooting
 
-1. **Sélection du template** : Menu interactif avec mémoire
-2. **Saisie du nom** : Prompt utilisateur
-3. **Gestion des doublons** : Vérification et propositions
-4. **Création du fichier** : Génération depuis template
-5. **Intégration dans Excalidraw** :
-   - Génération d'un fileId unique
-   - Ajout dans `## Embedded Files`
-   - Insertion de l'élément image dans le JSON
-   - Status "saved" pour affichage immédiat
-6. **Toggle programmatique** : Rafraîchissement forcé
-7. **Notification** : Confirmation de succès
+| Issue | Solution |
+|-------|----------|
+| Embed doesn't appear | ✅ Fixed in v1.3.0 with automatic toggle |
+| "No active file" error | Open an Excalidraw drawing first |
+| Templates not found | Check `Templates/` folder exists and contains valid files |
+| Duplicate filename | Script automatically suggests alternatives |
+| Creation error | Check folder permissions |
 
-### Mécanisme de rafraîchissement (v1.3.0)
+## 📊 Technical Architecture
 
-Le script utilise plusieurs méthodes pour garantir l'affichage :
-1. Toggle source/preview pour les vues Markdown
-2. setState() pour forcer le rechargement
-3. Fermeture/réouverture via fichier temporaire
-4. Déclenchement d'événements Obsidian
+### How It Works
 
-## 📈 Historique des versions
+1. **Template Selection**: Interactive menu with memory
+2. **Name Input**: User prompt with duplicate detection
+3. **File Creation**: Generate from template with variable substitution
+4. **Excalidraw Integration**:
+   - Generate unique fileId
+   - Add to `## Embedded Files` section
+   - Insert image element in JSON
+   - Set status "saved" for immediate display
+5. **Programmatic Toggle**: Force Excalidraw to refresh
+6. **Success Notification**: Confirm creation
 
-### v1.3.0 (15/08/2025) - **Version stable actuelle**
-- ✅ Toggle programmatique pour affichage immédiat
-- ✅ Résolution définitive du bug d'affichage
-- ✅ Optimisation des délais et méthodes de rafraîchissement
-- ✅ Support complet de tous les types de templates
+### The Innovation (v1.3.0)
 
-### v1.2.0 - v1.2.9 (14-15/08/2025)
-- Système de sélection dynamique de templates
-- Gestion avancée des doublons
-- Multiples corrections d'interface
-- Synchronisation nom fichier/embed
+The script implements multiple refresh strategies to ensure immediate display:
+1. Toggle source/preview for Markdown views
+2. setState() to force reload
+3. File close/reopen via temporary file
+4. Obsidian event triggering
 
-### v1.0.0 (13/08/2025)
-- Version initiale stable
-- Création basique avec template fixe
+This multi-strategy approach ensures compatibility across different Excalidraw states and view modes.
 
-## 🤝 Contribution
+## 📈 Version History
 
-Les contributions sont les bienvenues ! 
+### v1.3.0 (August 15, 2025) - **Current Stable**
+- ✅ Bilingual support (EN/FR) with auto-detection
+- ✅ Custom SVG icon for script menu
+- ✅ Programmatic toggle for immediate display
+- ✅ Final resolution of display bug
+- ✅ International release ready
 
-- **Signaler des bugs** : Via les [issues GitHub](https://github.com/RollandMELET/EXCALIDRAW_Script_EmbededDrawingFromTemplate/issues)
-- **Proposer des améliorations** : Pull requests acceptées
-- **Partager des templates** : Créez des exemples dans le dossier Templates
+### v1.2.0 - v1.2.9
+- Dynamic template selection system
+- Advanced duplicate handling
+- Multiple interface improvements
+- Filename/embed synchronization
 
-## 📝 Licence
+### v1.0.0
+- Initial stable release
+- Basic creation with fixed template
 
-MIT License - Voir le fichier LICENSE pour plus de détails
+## 🌟 Why This Matters
 
-## 👥 Auteurs
+This script bridges the gap between visual thinking and structured note-taking. It enables the Visual PKM methodology promoted by Zsolt without the friction of constant context switching. You can now build complex visual systems while maintaining the detailed metadata and connections that make Obsidian powerful.
 
-- **Rolland MELET** - CEO 360SmartConnect
-- **Claude Code** - Assistant IA Anthropic
+## 🤝 Contributing
+
+Contributions are welcome! 
+
+- **Report bugs**: Via [GitHub issues](https://github.com/RollandMELET/EXCALIDRAW_Script_EmbededDrawingFromTemplate/issues)
+- **Suggest improvements**: Pull requests accepted
+- **Share templates**: Add examples to the Templates folder
+- **Join the discussion**: [Obsidian Discord](https://discord.gg/obsidianmd) #excalidraw channel
+
+## 📝 License
+
+MIT License - See LICENSE file for details
+
+## 👥 Credits
+
+- **Rolland MELET** - Script Development & Visual PKM Implementation
+- **Claude (Anthropic)** - Development assistance
+- **Zsolt Viczian** - Excalidraw Plugin creator & Visual PKM inspiration
+- **Obsidian Community** - Feedback and ideas
 
 ## 💬 Support
 
-Pour toute question ou problème :
-- Ouvrez une issue sur le [dépôt GitHub](https://github.com/RollandMELET/EXCALIDRAW_Script_EmbededDrawingFromTemplate)
-- Contact : rm@360sc.io
+For questions or issues:
+- Open an issue on [GitHub](https://github.com/RollandMELET/EXCALIDRAW_Script_EmbededDrawingFromTemplate)
+- Contact: rm@360sc.io
+- Discord: Find me in the Obsidian Discord #excalidraw channel
 
 ---
 
-*Script développé pour optimiser les workflows de création de diagrammes dans Obsidian avec Excalidraw.*
+*Empowering Visual PKM in Obsidian - Create once, think visually, document thoroughly.*
 
-**Version Stable 1.3.0** - 15/08/2025
+**Version 1.3.0** - Bilingual Edition

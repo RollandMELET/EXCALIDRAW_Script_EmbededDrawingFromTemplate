@@ -1,29 +1,128 @@
 /*
+excalidraw-script-icon: <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M23 18C23 18.75 22.79 19.46 22.42 20.06C22.21 20.42 21.94 20.74 21.63 21C20.93 21.63 20.01 22 19 22C17.78 22 16.69 21.45 15.97 20.59C15.95 20.56 15.92 20.54 15.9 20.51C15.78 20.37 15.67 20.22 15.58 20.06C15.21 19.46 15 18.75 15 18C15 16.74 15.58 15.61 16.5 14.88C17.19 14.33 18.06 14 19 14C20 14 20.9 14.36 21.6 14.97C21.72 15.06 21.83 15.17 21.93 15.28C22.59 16 23 16.95 23 18Z" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M20.4898 17.98H17.5098" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M19 16.52V19.51" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path> <g opacity="0.4"> <path d="M3.16992 7.43994L11.9999 12.5499L20.7699 7.46991" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 21.61V12.54" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M21.6106 9.17V14.83C21.6106 14.88 21.6106 14.92 21.6006 14.97C20.9006 14.36 20.0006 14 19.0006 14C18.0606 14 17.1906 14.33 16.5006 14.88C15.5806 15.61 15.0006 16.74 15.0006 18C15.0006 18.75 15.2106 19.46 15.5806 20.06C15.6706 20.22 15.7806 20.37 15.9006 20.51L14.0706 21.52C12.9306 22.16 11.0706 22.16 9.93062 21.52L4.59062 18.56C3.38062 17.89 2.39062 16.21 2.39062 14.83V9.17C2.39062 7.79 3.38062 6.11002 4.59062 5.44002L9.93062 2.48C11.0706 1.84 12.9306 1.84 14.0706 2.48L19.4106 5.44002C20.6206 6.11002 21.6106 7.79 21.6106 9.17Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
 Script Excalidraw pour créer et intégrer des objets depuis un template
-Version 1.3.0 - Toggle programmatique pour affichage immédiat
+Excalidraw Script for creating and embedding objects from templates
+Version 1.3.0 - Bilingual Edition
 Author: Rolland MELET & Claude Code
 Date: 2025-08-15
 Changelog:
-- v1.3.0: Ajout du toggle programmatique Markdown/Excalidraw pour forcer l'affichage des embeds
-- v1.2.9: Fix critique - Synchronisation du nom dans l'embed entry avec le nom réel du fichier
-- v1.2.8: Fix affichage immédiat des embeds (status "saved" + ordre opérations)
-- v1.2.7: Approche simplifiée en deux étapes pour les doublons
-- v1.2.6: Fix titre "false" et permettre saisie directe de nouveaux noms
-- v1.2.5: Utilisation de utils.suggester() pour un menu de sélection élégant
-- v1.2.4: Fix - Entrée accepte maintenant correctement la suggestion par défaut
-- v1.2.3: Correction du message (Tab ne fonctionne pas avec inputPrompt)
-- v1.2.2: Tentative d'ajout de Tab (non fonctionnel - limitation API)
-- v1.2.1: Ajout de la gestion des doublons avec proposition automatique de nom
-- v1.2.0: Ajout de la sélection dynamique de templates
-- v1.0.0: Version initiale stable
+- v1.3.0: Bilingual support (EN/FR) + Custom icon + Programmatic toggle for instant display
+- v1.2.9: Fix critical - Sync filename/embed entry  
+- v1.2.8: Fix immediate display (status "saved" + operation order)
+- v1.2.7: Simplified two-step approach for duplicates
+- v1.2.6: Fix "false" title and allow direct name input
+- v1.2.5: Use utils.suggester() for elegant selection menu
+- v1.2.4: Fix - Enter now correctly accepts default suggestion
+- v1.2.3: Message correction (Tab doesn't work with inputPrompt)
+- v1.2.2: Tab attempt (non-functional - API limitation)
+- v1.2.1: Add duplicate handling with automatic name suggestion
+- v1.2.0: Add dynamic template selection
+- v1.0.0: Initial stable version
 */
 
-// Configuration
+// === CONFIGURATION ===
 const TEMPLATES_FOLDER = "Templates";
 const DEFAULT_TEMPLATE_NAME = "Embedded-Object-Template";
 const STORAGE_KEY = "excalidraw-embed-preferences";
 
-// Template par défaut intégré (fallback ultime)
+// === INTERNATIONALIZATION ===
+// Detect user language
+const getUserLanguage = () => {
+    const lang = moment?.locale() || 
+                 navigator.language || 
+                 app.locale || 
+                 'en';
+    return lang.startsWith('fr') ? 'fr' : 'en';
+};
+
+const lang = getUserLanguage();
+
+// Translation dictionary
+const i18n = {
+    en: {
+        selectTemplate: "Select a template",
+        objectName: "Workflow object name:",
+        defaultTemplate: "📦 Default template (built-in)",
+        fileExists: "already exists. Choose an option:",
+        enterCustomName: "💡 Enter another name...",
+        suggestionsAvailable: "Available suggestions:",
+        enterNewName: "Enter a new name:",
+        cancelled: "Creation cancelled",
+        noActiveFile: "No active file",
+        noTemplateFound: "No template found in Templates/. Using default template.",
+        templateSelected: "Template selected:",
+        defaultSelected: "Default template selected",
+        fileCreatedAs: "File created as",
+        objectCreated: "✅ Object",
+        createdWith: "created with",
+        error: "Error",
+        errorCreatingFile: "Unable to create file",
+        errorReadingTemplate: "Error reading template. Using default.",
+        invalidTemplate: "Selected template is not a valid Excalidraw file.",
+        scriptStarting: "Excalidraw Embed Script v1.3.0 - Starting",
+        scanningTemplates: "Scanning templates folder",
+        templatesFolder: "Templates folder",
+        notFound: "not found",
+        fileEmbed: "File embed created:",
+        errorFileStructure: "Error: File structure not recognized",
+        attemptingToggle: "Attempting programmatic toggle...",
+        viewDetected: "Excalidraw/Markdown view detected, toggling...",
+        toSourceMode: "Switching to source mode",
+        toPreviewMode: "Back to preview mode",
+        usingSetState: "Using setState to refresh",
+        toggleViaReopen: "Toggle via close/reopen file",
+        triggeringEvent: "Triggering file-open event",
+        toggleComplete: "Programmatic toggle complete",
+        toggleError: "Error during programmatic toggle:",
+        refreshError: "Error during fallback refresh:",
+        suggesterUnavailable: "utils.suggester unavailable, using fallback",
+        nameAlreadyExists: "(name already exists)"
+    },
+    fr: {
+        selectTemplate: "Sélectionnez un template",
+        objectName: "Nom de l'objet de workflow:",
+        defaultTemplate: "📦 Template par défaut (intégré)",
+        fileExists: "existe déjà. Choisissez une option :",
+        enterCustomName: "💡 Saisir un autre nom...",
+        suggestionsAvailable: "Suggestions disponibles :",
+        enterNewName: "Entrez un nouveau nom :",
+        cancelled: "Création annulée",
+        noActiveFile: "Aucun fichier actif",
+        noTemplateFound: "Aucun template trouvé dans le dossier Templates/. Utilisation du template par défaut.",
+        templateSelected: "Template sélectionné :",
+        defaultSelected: "Template par défaut sélectionné",
+        fileCreatedAs: "Fichier créé sous le nom",
+        objectCreated: "✅ Objet",
+        createdWith: "créé avec",
+        error: "Erreur",
+        errorCreatingFile: "Impossible de créer le fichier",
+        errorReadingTemplate: "Erreur lors de la lecture du template. Utilisation du template par défaut.",
+        invalidTemplate: "Le template sélectionné n'est pas un fichier Excalidraw valide.",
+        scriptStarting: "Script Excalidraw Embed v1.3.0 - Démarrage",
+        scanningTemplates: "Scan du dossier Templates",
+        templatesFolder: "Dossier Templates",
+        notFound: "non trouvé",
+        fileEmbed: "Fichier embed créé :",
+        errorFileStructure: "Erreur: Structure du fichier non reconnue",
+        attemptingToggle: "Tentative de toggle programmatique...",
+        viewDetected: "Vue Excalidraw/Markdown détectée, toggle en cours...",
+        toSourceMode: "Passage en mode source",
+        toPreviewMode: "Retour en mode preview",
+        usingSetState: "Utilisation de setState pour rafraîchir",
+        toggleViaReopen: "Toggle via fermeture/réouverture du fichier",
+        triggeringEvent: "Déclenchement d'un événement file-open",
+        toggleComplete: "Toggle programmatique terminé",
+        toggleError: "Erreur lors du toggle programmatique:",
+        refreshError: "Erreur lors du rafraîchissement fallback:",
+        suggesterUnavailable: "utils.suggester non disponible, utilisation du fallback",
+        nameAlreadyExists: "(nom déjà existant)"
+    }
+};
+
+// Helper function to get translation
+const t = (key) => i18n[lang][key] || i18n['en'][key];
+
+// Default template (fallback)
 const TEMPLATE_DEFAULT = `---
 
 excalidraw-plugin: parsed
@@ -75,7 +174,7 @@ tags: [excalidraw]
 \`\`\`
 %%`;
 
-// Générer un ID unique pour le fichier embed
+// Generate unique file ID
 function generateFileId() {
     const chars = 'abcdef0123456789';
     let result = '';
@@ -85,7 +184,7 @@ function generateFileId() {
     return result;
 }
 
-// Charger les préférences sauvegardées
+// Load saved preferences
 function loadPreferences() {
     try {
         const stored = localStorage.getItem(STORAGE_KEY);
@@ -93,7 +192,7 @@ function loadPreferences() {
             return JSON.parse(stored);
         }
     } catch (e) {
-        console.error("Erreur lors du chargement des préférences:", e);
+        console.error("Error loading preferences:", e);
     }
     return {
         lastUsedTemplate: null,
@@ -101,54 +200,41 @@ function loadPreferences() {
     };
 }
 
-// Sauvegarder les préférences
+// Save preferences
 function savePreferences(prefs) {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
     } catch (e) {
-        console.error("Erreur lors de la sauvegarde des préférences:", e);
+        console.error("Error saving preferences:", e);
     }
 }
 
-// Mettre à jour les templates récents
+// Update recent templates
 function updateRecentTemplates(templatePath, prefs) {
-    // Retirer le template s'il existe déjà dans la liste
     prefs.recentTemplates = prefs.recentTemplates.filter(t => t !== templatePath);
-    
-    // Ajouter en début de liste
     prefs.recentTemplates.unshift(templatePath);
-    
-    // Garder seulement les 5 derniers
     prefs.recentTemplates = prefs.recentTemplates.slice(0, 5);
-    
-    // Mettre à jour le dernier utilisé
     prefs.lastUsedTemplate = templatePath;
-    
     savePreferences(prefs);
 }
 
-// Scanner le dossier Templates pour trouver les fichiers disponibles
+// Scan Templates folder for available files
 async function getAvailableTemplates() {
     const templates = [];
     
     try {
-        // Vérifier si le dossier Templates existe
         const templatesFolder = app.vault.getAbstractFileByPath(TEMPLATES_FOLDER);
         
         if (!templatesFolder) {
-            console.log("Dossier Templates non trouvé");
+            console.log(`${t('templatesFolder')} ${t('notFound')}`);
             return templates;
         }
         
-        // Récupérer tous les fichiers du vault
         const allFiles = app.vault.getFiles();
         
-        // Filtrer pour garder seulement ceux dans le dossier Templates
         for (const file of allFiles) {
             if (file.path.startsWith(TEMPLATES_FOLDER + "/")) {
-                // Vérifier si c'est un fichier Markdown ou Excalidraw
                 if (file.extension === "md" || file.extension === "excalidraw") {
-                    // Vérifier si c'est un fichier Excalidraw valide
                     const content = await app.vault.read(file);
                     if (content.includes("excalidraw-plugin: parsed") || file.extension === "excalidraw") {
                         const relativePath = file.path.substring(TEMPLATES_FOLDER.length + 1);
@@ -166,7 +252,6 @@ async function getAvailableTemplates() {
             }
         }
         
-        // Trier par catégorie puis par nom
         templates.sort((a, b) => {
             if (a.category !== b.category) {
                 return a.category.localeCompare(b.category);
@@ -175,22 +260,21 @@ async function getAvailableTemplates() {
         });
         
     } catch (e) {
-        console.error("Erreur lors du scan des templates:", e);
+        console.error(`${t('error')} ${t('scanningTemplates')}:`, e);
     }
     
     return templates;
 }
 
-// Afficher le menu de sélection de template
+// Show template selection menu
 async function selectTemplate() {
     const prefs = loadPreferences();
     const templates = await getAvailableTemplates();
     
-    // Construire la liste des options
     const options = [];
     const templateMap = {};
     
-    // Ajouter les templates récents en premier (s'ils existent encore)
+    // Add recent templates first
     if (prefs.recentTemplates.length > 0) {
         const recentTemplates = [];
         for (const recentPath of prefs.recentTemplates) {
@@ -204,48 +288,46 @@ async function selectTemplate() {
         
         if (recentTemplates.length > 0) {
             options.push(...recentTemplates);
-            options.push("───────────────"); // Séparateur
+            options.push("───────────────");
         }
     }
     
-    // Ajouter tous les templates
+    // Add all templates
     for (const template of templates) {
         const option = template.displayName;
         options.push(option);
         templateMap[option] = template;
     }
     
-    // Ajouter l'option template par défaut
+    // Add default template option
     if (options.length > 0) {
-        options.push("───────────────"); // Séparateur
+        options.push("───────────────");
     }
-    options.push("📦 Template par défaut (intégré)");
+    options.push(t('defaultTemplate'));
     
-    // Si aucun template disponible, utiliser directement le template par défaut
+    // If no templates available, use default directly
     if (templates.length === 0 && prefs.recentTemplates.length === 0) {
-        new Notice("Aucun template trouvé dans le dossier Templates/. Utilisation du template par défaut.");
+        new Notice(t('noTemplateFound'));
         return null;
     }
     
-    // Afficher le menu de sélection
+    // Show selection menu
     let selectedOption;
     try {
-        // Utiliser utils.suggester si disponible (plus joli)
         if (typeof utils !== 'undefined' && utils.suggester) {
             selectedOption = await utils.suggester(
                 options,
                 options,
                 false,
-                "Sélectionnez un template"
+                t('selectTemplate')
             );
         } else {
-            // Fallback sur inputPrompt avec la liste numérotée
             const numberedOptions = options.map((opt, idx) => 
                 opt.startsWith("───") ? opt : `${idx + 1}. ${opt}`
             ).join("\n");
             
             const choice = await utils.inputPrompt(
-                `Sélectionnez un template (entrez le numéro):\n\n${numberedOptions}\n\nVotre choix:`
+                `${t('selectTemplate')}:\n\n${numberedOptions}\n\n:`
             );
             
             if (choice && !isNaN(choice)) {
@@ -256,31 +338,28 @@ async function selectTemplate() {
             }
         }
     } catch (e) {
-        console.error("Erreur lors de la sélection:", e);
+        console.error(`${t('error')}:`, e);
         return null;
     }
     
-    // Traiter la sélection
     if (!selectedOption) {
-        return null; // Annulation
+        return null;
     }
     
-    if (selectedOption === "📦 Template par défaut (intégré)") {
+    if (selectedOption === t('defaultTemplate')) {
         return { isDefault: true };
     }
     
     if (selectedOption.startsWith("───")) {
-        return null; // Séparateur sélectionné par erreur
+        return null;
     }
     
-    // Retirer le préfixe ⭐ si présent
     const cleanOption = selectedOption.startsWith("⭐ ") ? 
         selectedOption.substring(2) : selectedOption;
     
     const selectedTemplate = templateMap[selectedOption] || templateMap[cleanOption];
     
     if (selectedTemplate) {
-        // Mettre à jour les templates récents
         updateRecentTemplates(selectedTemplate.path, prefs);
         return selectedTemplate;
     }
@@ -288,9 +367,8 @@ async function selectTemplate() {
     return null;
 }
 
-// Obtenir le contenu du template sélectionné
+// Get template content
 async function getTemplateContent(templateInfo) {
-    // Si c'est le template par défaut
     if (templateInfo.isDefault) {
         return TEMPLATE_DEFAULT;
     }
@@ -299,29 +377,26 @@ async function getTemplateContent(templateInfo) {
         const templateFile = app.vault.getAbstractFileByPath(templateInfo.path);
         if (templateFile) {
             const content = await app.vault.read(templateFile);
-            // Vérifier si c'est un fichier Excalidraw valide
             if (!content.includes("excalidraw-plugin: parsed")) {
-                new Notice("Le template sélectionné n'est pas un fichier Excalidraw valide.");
+                new Notice(t('invalidTemplate'));
                 return TEMPLATE_DEFAULT;
             }
             return content;
         }
     } catch (e) {
-        console.error("Erreur lors de la lecture du template:", e);
-        new Notice("Erreur lors de la lecture du template. Utilisation du template par défaut.");
+        console.error(`${t('errorReadingTemplate')}:`, e);
+        new Notice(t('errorReadingTemplate'));
     }
     
     return TEMPLATE_DEFAULT;
 }
 
-// Obtenir le centre de la vue actuelle
+// Get current view center
 function getViewCenter(excalidrawContent) {
     try {
-        // Extraire appState du contenu
         const appStateMatch = excalidrawContent.match(/"appState":\s*{([^}]*)}/);
         if (appStateMatch) {
             const appStateStr = `{${appStateMatch[1]}}`;
-            // Extraire scrollX, scrollY et zoom
             const scrollXMatch = appStateStr.match(/"scrollX":\s*([-\d.]+)/);
             const scrollYMatch = appStateStr.match(/"scrollY":\s*([-\d.]+)/);
             const zoomMatch = appStateStr.match(/"zoom":\s*{[^}]*"value":\s*([\d.]+)/);
@@ -331,7 +406,6 @@ function getViewCenter(excalidrawContent) {
                 const scrollY = parseFloat(scrollYMatch[1]);
                 const zoom = zoomMatch ? parseFloat(zoomMatch[1]) : 1;
                 
-                // Calculer le centre de la vue
                 const viewportWidth = 800;
                 const viewportHeight = 600;
                 
@@ -342,75 +416,70 @@ function getViewCenter(excalidrawContent) {
             }
         }
     } catch (e) {
-        // Retourner les valeurs par défaut en cas d'erreur
+        // Return default values on error
     }
     
     return { x: 0, y: 0 };
 }
 
-// Script principal
+// Main script
 (async () => {
-    console.log("Script Excalidraw Embed v1.3.0 - Démarrage");
+    console.log(t('scriptStarting'));
     
-    // Étape 1: Sélectionner le template
+    // Step 1: Select template
     const templateInfo = await selectTemplate();
     
     if (!templateInfo) {
-        new Notice("Sélection de template annulée");
+        new Notice(t('cancelled'));
         return;
     }
     
-    // Afficher le template sélectionné
+    // Display selected template
     if (templateInfo.isDefault) {
-        console.log("Template par défaut sélectionné");
+        console.log(t('defaultSelected'));
     } else {
-        console.log(`Template sélectionné: ${templateInfo.displayName}`);
+        console.log(`${t('templateSelected')} ${templateInfo.displayName}`);
     }
     
-    // Étape 2: Demander le nom de l'objet
-    let objectName = await utils.inputPrompt("Nom de l'objet de workflow:");
+    // Step 2: Get object name
+    let objectName = await utils.inputPrompt(t('objectName'));
     if (!objectName) {
-        new Notice("Création annulée");
+        new Notice(t('cancelled'));
         return;
     }
     
-    // Obtenir le fichier actif
+    // Get active file
     const activeFile = app.workspace.getActiveFile();
     if (!activeFile) {
-        new Notice("Aucun fichier actif");
+        new Notice(t('noActiveFile'));
         return;
     }
     
-    // Fonction pour générer un nom unique
+    // Function to generate unique filename
     async function getUniqueFileName(baseName, folder) {
         let fileName = `${baseName}.md`;
         let filePath = folder ? `${folder.path}/${fileName}` : fileName;
         
-        // Si le fichier n'existe pas, retourner directement
         if (!app.vault.getAbstractFileByPath(filePath)) {
             return { name: baseName, fileName: fileName, filePath: filePath };
         }
         
-        // Le fichier existe, proposer des alternatives
         const choices = [];
-        let counter = 1;
         
-        // Générer plusieurs suggestions
-        // Style Windows : nom(1), nom(2)
+        // Generate suggestions - Windows style: name(1), name(2)
         for (let i = 1; i <= 3; i++) {
             const suggestion = `${baseName}(${i})`;
             const suggestionPath = folder ? 
                 `${folder.path}/${suggestion}.md` : 
                 `${suggestion}.md`;
             
-            // Vérifier si ce nom est disponible
             if (!app.vault.getAbstractFileByPath(suggestionPath)) {
                 choices.push(suggestion);
-                if (choices.length >= 2) break; // On veut au moins 2 options
+                if (choices.length >= 2) break;
             }
         }
         
-        // Style version : nom_v2
+        // Version style: name_v2
         const versionName = `${baseName}_v2`;
         const versionPath = folder ? 
             `${folder.path}/${versionName}.md` : 
@@ -419,7 +488,7 @@ function getViewCenter(excalidrawContent) {
             choices.push(versionName);
         }
         
-        // Style copie : nom_copy
+        // Copy style: name_copy
         const copyName = `${baseName}_copy`;
         const copyPath = folder ? 
             `${folder.path}/${copyName}.md` : 
@@ -428,64 +497,54 @@ function getViewCenter(excalidrawContent) {
             choices.push(copyName);
         }
         
-        // Ajouter l'option pour choisir un nom personnalisé
-        choices.push("💡 Saisir un autre nom...");
+        choices.push(t('enterCustomName'));
         
-        // Approche simplifiée : Menu de sélection sans saisie libre
+        // Simplified approach: Selection menu without free input
         let selected;
         try {
             if (typeof utils !== 'undefined' && utils.suggester) {
-                // Créer les labels d'affichage
                 const displayLabels = choices.map(choice => {
-                    if (choice === "💡 Saisir un autre nom...") {
+                    if (choice === t('enterCustomName')) {
                         return choice;
                     }
                     return `✓ ${choice}`;
                 });
                 
-                // Utiliser suggester simple sans allowCustomValue
                 selected = await utils.suggester(
-                    displayLabels,  // Ce qui est affiché
-                    choices,        // Les valeurs retournées
-                    false,          // Pas de saisie libre ici
-                    `"${baseName}.md" existe déjà. Choisissez une option :`
+                    displayLabels,
+                    choices,
+                    false,
+                    `"${baseName}.md" ${t('fileExists')}`
                 );
             } else {
-                // Fallback si suggester n'est pas disponible
-                console.log("utils.suggester non disponible, utilisation du fallback");
-                // Utiliser automatiquement la première suggestion
+                console.log(t('suggesterUnavailable'));
                 selected = choices[0];
-                new Notice(`Fichier créé sous le nom "${selected}.md" (nom déjà existant)`);
+                new Notice(`${t('fileCreatedAs')} "${selected}.md" ${t('nameAlreadyExists')}`);
             }
         } catch (e) {
-            console.error("Erreur avec suggester:", e);
-            // En cas d'erreur, utiliser la première suggestion
+            console.error(`${t('error')} suggester:`, e);
             selected = choices[0];
         }
         
-        // Traiter la sélection
         if (!selected) {
-            return null; // Annulation
+            return null;
         }
         
-        if (selected === "💡 Saisir un autre nom...") {
-            // Deuxième étape : Demander un nom personnalisé
+        if (selected === t('enterCustomName')) {
             let customName = await utils.inputPrompt(
-                `Le fichier "${baseName}.md" existe déjà.\n\n` +
-                `Suggestions disponibles : ${choices.slice(0, -1).join(", ")}\n\n` +
-                `Entrez un nouveau nom :`,
-                baseName + "_new"  // Suggestion par défaut
+                `"${baseName}.md" ${t('fileExists')}\n\n` +
+                `${t('suggestionsAvailable')} ${choices.slice(0, -1).join(", ")}\n\n` +
+                `${t('enterNewName')}`,
+                baseName + "_new"
             );
             
             if (!customName) {
-                return null; // Annulation
+                return null;
             }
             
-            // Vérifier récursivement le nouveau nom
             return await getUniqueFileName(customName, folder);
         }
         
-        // Utiliser le nom sélectionné dans la liste
         const selectedFileName = `${selected}.md`;
         const selectedFilePath = folder ? 
             `${folder.path}/${selectedFileName}` : 
@@ -498,73 +557,68 @@ function getViewCenter(excalidrawContent) {
         };
     }
     
-    // Obtenir le dossier parent et un nom de fichier unique
+    // Get parent folder and unique filename
     const folder = activeFile.parent;
     const fileInfo = await getUniqueFileName(objectName, folder);
     
     if (!fileInfo) {
-        new Notice("Création annulée");
+        new Notice(t('cancelled'));
         return;
     }
     
-    // Mettre à jour le nom de l'objet avec le nom final (après résolution des doublons)
-    const finalObjectName = fileInfo.name;  // Le nom final qui sera utilisé partout
+    const finalObjectName = fileInfo.name;
     const newFileName = fileInfo.fileName;
     const newFilePath = fileInfo.filePath;
     
     try {
-        // Créer le fichier embed EN PREMIER
-        // Obtenir le contenu du template
+        // Create embed file FIRST
         const templateContent = await getTemplateContent(templateInfo);
         const content = templateContent.replace(/\${objectName}/g, finalObjectName);
         
-        // Créer le nouveau fichier avec gestion d'erreur
         let newFile;
         try {
             newFile = await app.vault.create(newFilePath, content);
-            console.log(`Fichier embed créé: ${newFilePath}`);
+            console.log(`${t('fileEmbed')} ${newFilePath}`);
         } catch (createError) {
-            // Si la création échoue malgré nos vérifications
-            console.error("Erreur lors de la création du fichier:", createError);
-            new Notice(`Erreur: Impossible de créer le fichier "${newFileName}". ${createError.message}`);
+            console.error(`${t('errorCreatingFile')}:`, createError);
+            new Notice(`${t('error')}: ${t('errorCreatingFile')} "${newFileName}". ${createError.message}`);
             return;
         }
         
-        // Attendre que le fichier soit indexé par Obsidian
+        // Wait for file indexing
         await new Promise(resolve => setTimeout(resolve, 200));
         
-        // Générer un ID unique pour l'embed
+        // Generate unique ID for embed
         const fileId = generateFileId();
         
-        // Lire le contenu actuel du fichier Excalidraw
+        // Read current Excalidraw file content
         let excalidrawContent = await app.vault.read(activeFile);
         
-        // Parser le JSON du dessin
+        // Parse drawing JSON
         const drawingMatch = excalidrawContent.match(/## Drawing\n```json\n([\s\S]*?)\n```/);
         if (!drawingMatch) {
-            new Notice("Erreur: Structure du fichier non reconnue");
+            new Notice(t('errorFileStructure'));
             return;
         }
         
         const drawingData = JSON.parse(drawingMatch[1]);
         
-        // Calculer la position - centré dans la vue actuelle
+        // Calculate position - centered in current view
         const viewCenter = getViewCenter(excalidrawContent);
-        let x = viewCenter.x - 200; // Centrer horizontalement (largeur/2)
-        let y = viewCenter.y - 150; // Centrer verticalement (hauteur/2)
+        let x = viewCenter.x - 200;
+        let y = viewCenter.y - 150;
         
-        // Si des embeds existent déjà, décaler légèrement pour éviter la superposition
+        // Cascade offset if embeds already exist
         if (drawingData.elements && drawingData.elements.length > 0) {
             const embedElements = drawingData.elements.filter(el => el.type === "image" && el.fileId);
             if (embedElements.length > 0) {
-                // Décalage en cascade pour chaque nouvel embed
                 const offset = (embedElements.length % 5) * 30;
                 x += offset;
                 y += offset;
             }
         }
         
-        // Créer l'élément image pour l'embed avec status "saved"
+        // Create image element for embed with status "saved"
         const imageElement = {
             id: generateFileId().substring(0, 16),
             type: "image",
@@ -590,46 +644,39 @@ function getViewCenter(excalidrawContent) {
             updated: Date.now(),
             link: null,
             locked: false,
-            status: "saved",  // Status "saved" pour indiquer que l'embed est prêt
+            status: "saved",
             fileId: fileId,
             scale: [1, 1]
         };
         
-        // Ajouter l'élément au dessin
+        // Add element to drawing
         drawingData.elements = drawingData.elements || [];
         drawingData.elements.push(imageElement);
         
-        // Gérer la section Embedded Files avec le format 100% pour forcer le mode Excalidraw
-        // IMPORTANT : Utiliser finalObjectName qui correspond au nom réel du fichier créé
+        // Manage Embedded Files section
         const embedEntry = `${fileId}: [[${finalObjectName}|100%]]`;
         
-        // Rechercher la section Embedded Files
         const embeddedFilesRegex = /## Embedded Files\n([\s\S]*?)(?=\n%%|$)/;
         const embeddedFilesMatch = excalidrawContent.match(embeddedFilesRegex);
         
         if (embeddedFilesMatch) {
-            // La section existe déjà
             let existingContent = embeddedFilesMatch[1].trim();
             
-            // Ajouter la nouvelle entrée
             const newContent = existingContent ? 
                 `${existingContent}\n${embedEntry}` : 
                 embedEntry;
             
-            // Remplacer la section
             excalidrawContent = excalidrawContent.replace(
                 embeddedFilesRegex, 
                 `## Embedded Files\n${newContent}\n`
             );
         } else {
-            // Créer la section Embedded Files si elle n'existe pas
             const textElementsIndex = excalidrawContent.indexOf("## Text Elements");
             const drawingIndex = excalidrawContent.indexOf("## Drawing");
             const percentIndex = excalidrawContent.indexOf("%%");
             
             let insertPosition;
             
-            // Insérer avant %% si présent, sinon avant ## Drawing
             if (percentIndex > -1 && percentIndex < drawingIndex) {
                 insertPosition = percentIndex;
             } else if (drawingIndex > -1) {
@@ -638,112 +685,103 @@ function getViewCenter(excalidrawContent) {
                 return;
             }
             
-            // Insérer la nouvelle section
             excalidrawContent = 
                 excalidrawContent.slice(0, insertPosition) + 
                 `## Embedded Files\n${embedEntry}\n\n` +
                 excalidrawContent.slice(insertPosition);
         }
         
-        // Remplacer le JSON du dessin
+        // Replace drawing JSON
         const newDrawingJson = JSON.stringify(drawingData, null, "\t");
         excalidrawContent = excalidrawContent.replace(
             /## Drawing\n```json\n[\s\S]*?\n```/,
             `## Drawing\n\`\`\`json\n${newDrawingJson}\n\`\`\``
         );
         
-        // Sauvegarder les modifications
+        // Save modifications
         await app.vault.modify(activeFile, excalidrawContent);
         
-        // Forcer la sauvegarde immédiate sur le disque
+        // Force save to disk
         await app.vault.adapter.write(activeFile.path, excalidrawContent);
         
-        // Attendre que la sauvegarde soit complète
+        // Wait for save to complete
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // NOUVEAU : Toggle programmatique pour forcer Excalidraw à recharger les embeds
+        // PROGRAMMATIC TOGGLE to force Excalidraw to reload embeds
         try {
-            console.log("Tentative de toggle programmatique...");
+            console.log(t('attemptingToggle'));
             
-            // Obtenir la vue active
             const activeLeaf = app.workspace.activeLeaf;
             if (activeLeaf && activeLeaf.view) {
                 const view = activeLeaf.view;
                 
-                // Méthode 1 : Si c'est une vue Markdown/Excalidraw
+                // Method 1: If it's a Markdown/Excalidraw view
                 if (view.getViewType && (view.getViewType() === "markdown" || view.getViewType() === "excalidraw")) {
-                    console.log("Vue Excalidraw/Markdown détectée, toggle en cours...");
+                    console.log(t('viewDetected'));
                     
-                    // Sauvegarder l'état actuel
                     const currentState = view.getState ? view.getState() : null;
                     
-                    // Passer en mode source (Markdown)
+                    // Switch to source mode
                     if (view.setMode) {
                         await view.setMode('source');
-                        console.log("Passage en mode source");
+                        console.log(t('toSourceMode'));
                         await new Promise(resolve => setTimeout(resolve, 200));
                         
-                        // Revenir en mode preview (Excalidraw)
+                        // Back to preview mode
                         await view.setMode('preview');
-                        console.log("Retour en mode preview");
+                        console.log(t('toPreviewMode'));
                     } else if (view.setState && currentState) {
-                        // Méthode alternative : forcer un rechargement de l'état
-                        console.log("Utilisation de setState pour rafraîchir");
+                        console.log(t('usingSetState'));
                         await view.setState(currentState, { history: false });
                     }
                 }
-                
-                // Méthode 2 : Fermer et rouvrir le fichier
+                // Method 2: Close and reopen file
                 else {
-                    console.log("Toggle via fermeture/réouverture du fichier");
+                    console.log(t('toggleViaReopen'));
                     
-                    // Créer une note temporaire vide
                     const tempNote = await app.vault.create(`temp-${Date.now()}.md`, "");
                     
-                    // Ouvrir la note temporaire
                     await activeLeaf.openFile(tempNote);
                     await new Promise(resolve => setTimeout(resolve, 100));
                     
-                    // Rouvrir le fichier Excalidraw
                     await activeLeaf.openFile(activeFile);
                     await new Promise(resolve => setTimeout(resolve, 100));
                     
-                    // Supprimer la note temporaire
                     await app.vault.delete(tempNote);
                 }
                 
-                // Méthode 3 : Déclencher un événement de modification
+                // Method 3: Trigger modification event
                 if (app.workspace.trigger) {
-                    console.log("Déclenchement d'un événement file-open");
+                    console.log(t('triggeringEvent'));
                     app.workspace.trigger('file-open', activeFile);
                 }
                 
-                console.log("Toggle programmatique terminé");
+                console.log(t('toggleComplete'));
             }
         } catch (e) {
-            console.error("Erreur lors du toggle programmatique:", e);
+            console.error(t('toggleError'), e);
             
-            // Fallback : rafraîchissement simple
+            // Fallback: simple refresh
             try {
                 const activeLeaf = app.workspace.activeLeaf;
                 if (activeLeaf) {
                     await activeLeaf.openFile(activeFile);
                 }
             } catch (e2) {
-                console.error("Erreur lors du rafraîchissement fallback:", e2);
+                console.error(t('refreshError'), e2);
             }
         }
         
-        // Message de succès avec info sur le template utilisé
+        // Success message
         const templateName = templateInfo.isDefault ? 
-            "template par défaut" : 
+            t('defaultTemplate') : 
             templateInfo.displayName;
-        new Notice(`✅ Objet "${finalObjectName}" créé avec ${templateName}!`);
+        new Notice(`${t('objectCreated')} "${finalObjectName}" ${t('createdWith')} ${templateName}!`);
         
-        console.log(`Objet créé avec succès: ${finalObjectName} (Template: ${templateName})`);
+        console.log(`${t('objectCreated')} ${finalObjectName} (Template: ${templateName})`);
         
     } catch (error) {
-        console.error("Erreur lors de la création:", error);
-        new Notice(`Erreur: ${error.message}`);
+        console.error(`${t('error')}:`, error);
+        new Notice(`${t('error')}: ${error.message}`);
     }
 })();
