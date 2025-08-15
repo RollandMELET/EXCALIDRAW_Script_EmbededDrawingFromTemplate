@@ -1,2 +1,10 @@
 # Ignore old directory and all its contents
 old/
+SESSION/
+
+# Ignore all files with the .tmp extension
+*.tmp
+
+# Ignore this file
+.DS_Store
+CLAUDE.md
